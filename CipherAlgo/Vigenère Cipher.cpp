@@ -1,48 +1,119 @@
-#include<stdio.h>
-#include<string.h>
-#include<stdlib.h>
+#include<bits/stdc++.h>
+using namespace std;
 
-int main()
+char cptext[100];
+char table[50][50];
+
+void fillTable();
+void Input(char [], char [] );
+void encrypt(char [], char [] );
+void decrypt(char [], char [] );
+void prePosses (char [], char [] );
+void vigenereCipher (char [], char [] );
+
+int main ()
 {
-      int count, j;
-      char message[50];
-      char key[20];
-      printf("\nEnter Message To Encode:\t");
-      fflush(stdin);
-      scanf("%[^\n]s", message);
-      printf("\nEnter Key:\t");
-      fflush(stdin);
-      scanf("%[^\n]s", key);
-      int message_length = strlen(message), key_length = strlen(key);
-      char temp_key[message_length], encrypted_message[message_length], decrypted_message[message_length];
-      for(count = 0, j = 0; count < message_length; ++count, ++j)
-      {
-            if(j == key_length)
-            {
-                  j = 0;
+    char str[100], key[100];
+
+    vigenereCipher(str, key);   /* algorithm */
+
+    return 0;
+}
+
+void vigenereCipher (char str[], char key[]) {
+
+    fillTable();
+
+    int choice;
+    while(1) {
+        printf("\n\t\t(1) Encrypt");
+    	printf("\n\t\t(2) Decrypt");
+    	printf("\n\t\t(3) Exit");
+    	printf("\n\t\tEnter your choice: ");		scanf("%d", &choice);
+    	getchar();
+
+    	switch(choice) {
+    		case 1:
+    			Input(str, key);
+    			prePosses(str, key);
+    			encrypt(str, key);		printf("\n\t\tEncrypt text: %s\n", cptext);
+    			break;
+    		case 2:
+    			Input(str, key);
+    			prePosses(str, key);
+    			decrypt(str, key);		printf("\n\t\tDecrypt text: %s\n", cptext);
+    			break;
+    		default:
+    			exit(0);
+    			break;
+		}
+    }
+}
+
+void fillTable() {
+    for(int col=0; col<26; col++) {
+        for(int row=0; row<26; row++) {
+            table[col][row] = ((col + row)%26) + 'A';
+        }
+    }
+}
+
+void Input(char str[], char key[]) {
+	printf("\n\t\tEnter plain text: "); 	gets(str);
+    printf("\t\tEnter key: ");          	scanf("%s", key);
+}
+
+
+void encrypt(char str[], char key[]) {
+    int in = 0;
+    for(int i=0; str[i]; i++) {
+        int col = key[i] - 'A';
+        int row = str[i] - 'A';
+
+        if (str[i]>='A' && str[i]<='Z') {
+            cptext[in++] = table[col][row];
+        }
+        else cptext[in++] = str[i];
+    }
+    cptext[in] = '\0';
+}
+
+void decrypt(char str[], char key[]) {
+    int in = 0;
+    for(int i=0; str[i]; i++) {
+        if (str[i]>='A' && str[i]<='Z') {
+            int col = key[i] - 'A';
+            char ch = str[i];
+            int row = 0;
+            for(int i=0; i<26; i++) {
+                if (table[col][i] == ch) {
+                    row = i;
+                    break;
+                }
             }
-            temp_key[count] = key[j];
-      }
-      temp_key[count] = '\0';
-      count = 0;
-      while(count < message_length)
-      {
-            encrypted_message[count] = ((message[count] + temp_key[count]) % 26) + 'A';
-            count = count + 1;
-      }
-      encrypted_message[count] = '\0';
-      count = 0;
-      while(count < message_length)
-      {
-            decrypted_message[count] = (((encrypted_message[count] - temp_key[count]) + 26) % 26) + 'A';
-            count = count + 1;
-      }
-      decrypted_message[count] = '\0';
-      printf("\n-------------------------------\n");
-      printf("\nIntial String:\t%s", message);
-      printf("\nKey:\t%s", key);
-      printf("\nGenerated Key:\t%s", temp_key);
-      printf("\nEncrypted Message:\t%s", encrypted_message);
-      printf("\nDecrypted Message:\t%s", decrypted_message);
-      return 0;
+            cptext[in++] = table[0][row];
+        }
+        else cptext[in++] = str[i];
+    }
+    cptext[in] = '\0';
+}
+
+void prePosses (char str[], char key[]) {
+    strupr(str);    strupr(key);
+
+    int len     = strlen(str);
+    int lenKey  = strlen(key);
+    int index   = lenKey;
+
+    if (len > lenKey) {
+        for(int i=lenKey; i<len; i++) {
+            if (str[i]>='A' && str[i]<='Z') {
+                key[index++] = key[i % lenKey];
+            }
+            else
+            key[index++] = ' ';
+        }
+        key[index] = '\0';
+    }
+    else key[len] = '\0';
 }
